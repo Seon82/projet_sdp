@@ -11,9 +11,10 @@ packages = [{include = "projet_sdp"}]
 python = "^3.10"
 gurobipy = "^10.0.0"
 numpy = "^1.24.1"
+pandas = "^1.5.2"
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.10.0"
+black = {extras = ["jupyter"], version = "^22.12.0"}
 isort = "^5.10.1"
 ruff = "^0.0.210"
 

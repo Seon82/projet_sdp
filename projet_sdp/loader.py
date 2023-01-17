@@ -15,7 +15,7 @@ class Data:
     # Caching values for functions
     _qualifications: List[int]
     _conges: List[int]
-    _duree_projets: List[List[int]]
+    _duree: List[List[int]]
     _gain: List[int]
     _due_date: List[int]
     _penalty: List[int]
@@ -43,7 +43,7 @@ class Data:
         return self._conges[e]
 
     def duree(self, p: int, q: int) -> int:
-        return self._duree_projets[p][q]
+        return self._duree[p][q]
 
     def gain(self, p: int) -> int:
         return self._gain[p]
@@ -78,18 +78,18 @@ def load_data_from_json(path: str) -> Data:
         P = len(_projects_names)
         N = json_data["horizon"]
 
-        _duree_projets = list(
+        _duree = list(
             map(lambda x: list(map(lambda job: job, x["working_days_per_qualification"].items())), json_data["jobs"])
         )
 
         for p in range(P):
             duree = list(np.zeros(shape=(Q), dtype=int))
-            for workload in _duree_projets[p]:
+            for workload in _duree[p]:
                 index = _qualifications_names.index(workload[0])
                 duree[index] = workload[1]
-            _duree_projets[p] = duree
+            _duree[p] = duree
 
-        _conges = list(map(lambda x: x["vacations"], json_data["staff"]))
+        _conges = list(map(lambda x: list(np.array(x["vacations"]) - 1), json_data["staff"]))
         _gain = list(map(lambda x: x["gain"], json_data["jobs"]))
         _due_date = list(map(lambda x: x["due_date"] - 1, json_data["jobs"]))
         _penalty = list(map(lambda x: x["daily_penalty"], json_data["jobs"]))
@@ -101,7 +101,7 @@ def load_data_from_json(path: str) -> Data:
             P,
             _qualifications,
             _conges,
-            _duree_projets,
+            _duree,
             _gain,
             _due_date,
             _penalty,
