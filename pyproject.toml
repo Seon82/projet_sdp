@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "projet_sdp"
+version = "0.1.0"
+description = "A short description of the project"
+authors = ["Carl Risk", "David de la Hera Carretero", "Dylan Sechet"]
+license =  "MIT"
+readme = "README.md"
+packages = [{include = "projet_sdp"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+gurobipy = "^10.0.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.10.0"
+isort = "^5.10.1"
+ruff = "^0.0.210"
+
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+line_length = 120
+
+[tool.ruff]
+ignore-init-module-imports = true
+line-length = 120
