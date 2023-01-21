@@ -1,5 +1,5 @@
 {
-  "horizon": 3,
+  "horizon": 5,
   "qualifications": ["A"],
   "staff": [
     {
@@ -20,7 +20,7 @@
       "due_date": 3,
       "daily_penalty": 3,
       "working_days_per_qualification": {
-        "A": 2
+        "A": 5
       }
     }
   ]

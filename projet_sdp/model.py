@@ -16,7 +16,9 @@ class Model:
     def objective_max_gain(self):
         sum_gain = sum(self.data.gain(p) * self.realise(p, self.data.N - 1) for p in range(self.data.P))
         sum_penalite = sum(
-            self.data.penalite(p, j) * (1 - self.realise(p, j)) for j in range(self.data.N) for p in range(self.data.P)
+            self.data.penalite(p, j) * (1 - self.realise(p, j - 1))
+            for j in range(self.data.N)
+            for p in range(self.data.P)
         )
         self.model.setObjective(sum_gain - sum_penalite, gurobipy.GRB.MAXIMIZE)
 

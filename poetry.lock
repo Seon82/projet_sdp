@@ -167,6 +167,21 @@ files = [
 matrixapi = ["numpy", "scipy"]
 
 [[package]]
+name = "gurobipy-stubs"
+version = "2.0.0"
+description = "Type stubs for gurobipy"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "gurobipy-stubs-2.0.0.tar.gz", hash = "sha256:64c388ce4f4ec1dd040a4f0119574c44af8fbc8ca56d8c01d3f4cebd593d36fe"},
+    {file = "gurobipy_stubs-2.0.0-py3-none-any.whl", hash = "sha256:7fe3444dff1cfe19a58a746d69202f3ed0151138f43a91d0bce3ec4e6cf00715"},
+]
+
+[package.dependencies]
+gurobipy = ">=10.0.0,<11.0.0"
+
+[[package]]
 name = "ipython"
 version = "8.8.0"
 description = "IPython: Productive Interactive Computing"
@@ -624,4 +639,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "d09244bf51ed6253f45a9052689ec19af4e041314d0582c43b3c79a3bbb5d0ad"
+content-hash = "9bddcc4449356837ea9b29f86149036a1bfcee646759682477e26fa36d652055"
