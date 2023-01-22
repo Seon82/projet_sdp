@@ -14,11 +14,9 @@ class Model:
         self._debute = self._define_debute()
 
     def objective_max_gain(self):
-        sum_gain = sum(self.data.gain(p) * self.realise(p, self.data.N - 1) for p in range(self.data.P))
+        sum_gain = sum(self.data.gain(p) * self.realise(p, self.data.N) for p in range(self.data.P))
         sum_penalite = sum(
-            self.data.penalite(p, j) * (1 - self.realise(p, j - 1))
-            for j in range(self.data.N)
-            for p in range(self.data.P)
+            self.data.penalite(p, j) * (1 - self.realise(p, j)) for j in range(self.data.N) for p in range(self.data.P)
         )
         self.model.setObjective(sum_gain - sum_penalite, gurobipy.GRB.MAXIMIZE)
 
@@ -57,11 +55,11 @@ class Model:
 
     def determine_realise(self):
         for p in range(self.data.P):
-            for j in range(self.data.N):
+            for j in range(self.data.N + 1):
                 sum_duree = sum(self.data.duree(p, q) for q in range(self.data.Q))
                 sum_projet = sum(
                     self.projet(e, j_prime, p, q)
-                    for j_prime in range(j + 1)
+                    for j_prime in range(min(j, self.data.N))
                     for e in range(self.data.E)
                     for q in range(self.data.Q)
                 )
@@ -107,8 +105,8 @@ class Model:
         return self._affecte[e, p]
 
     def _define_realise(self):
-        _realise = np.ndarray(shape=(self.data.P, self.data.N), dtype=object)
-        for j in range(self.data.N):
+        _realise = np.ndarray(shape=(self.data.P, self.data.N + 1), dtype=object)
+        for j in range(self.data.N + 1):
             for p in range(self.data.P):
                 _realise[p, j] = self.model.addVar(
                     name=f"[Realise]projet:{self.data.projet_name(p)}_jour:{j}", vtype="B"

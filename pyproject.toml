@@ -2,7 +2,7 @@
 name = "projet_sdp"
 version = "0.1.0"
 description = "A short description of the project"
-authors = ["Carl Risk", "David de la Hera Carretero", "Dylan Sechet"]
+authors = ["Carl Rizk", "David de la Hera Carretero", "Dylan Sechet"]
 license =  "MIT"
 readme = "README.md"
 packages = [{include = "projet_sdp"}]
