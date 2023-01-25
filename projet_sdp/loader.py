@@ -83,7 +83,7 @@ def load_data_from_json(path: str) -> Data:
         )
 
         for p in range(P):
-            duree = list(np.zeros(shape=(Q), dtype=int))
+            duree = [0] * Q
             for workload in _duree[p]:
                 index = _qualifications_names.index(workload[0])
                 duree[index] = workload[1]
