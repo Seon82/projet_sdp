@@ -13,6 +13,8 @@ gurobipy = "^10.0.0"
 numpy = "^1.24.1"
 pandas = "^1.5.2"
 gurobipy-stubs = "^2.0.0"
+ipykernel = "^6.20.2"
+matplotlib = "^3.6.3"
 
 [tool.poetry.group.dev.dependencies]
 black = {extras = ["jupyter"], version = "^22.12.0"}
