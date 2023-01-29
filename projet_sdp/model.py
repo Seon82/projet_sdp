@@ -1,6 +1,7 @@
 import gurobipy
 import numpy as np
-from loader import Data
+
+from .loader import Data
 
 
 class Model:
@@ -13,18 +14,95 @@ class Model:
         self._affecte = self._define_affecte()
         self._debute = self._define_debute()
 
-    def objective_max_gain(self):
+    def objective_max_gain_fun(self):
         sum_gain = sum(self.data.gain(p) * self.realise(p, self.data.N) for p in range(self.data.P))
         sum_penalite = sum(
             self.data.penalite(p, j) * (1 - self.realise(p, j)) for j in range(self.data.N) for p in range(self.data.P)
         )
-        self.model.setObjective(sum_gain - sum_penalite, gurobipy.GRB.MAXIMIZE)
+        return sum_gain - sum_penalite
+
+    def objective_max_gain(self):
+        obj = self.objective_max_gain_fun()
+        self.model.setObjective(obj, gurobipy.GRB.MAXIMIZE)
+
+    def objective_min_affecte_func(self):
+        total_affectes = -sum(self.affecte(e, p) for e in range(self.data.E) for p in range(self.data.P))
+        return total_affectes
+
+    def objective_min_affecte(self):
+        obj = self.objective_min_affecte_func()
+        self.model.setObjective(obj, gurobipy.GRB.MAXIMIZE)
+
+    def objective_min_length_func(self):
+        total_lengths = sum(
+            self.realise(p, j) - self.debute(p, j) for j in range(self.data.N) for p in range(self.data.P)
+        )
+        return total_lengths
+
+    def objective_min_length(self):
+        obj = self.objective_min_length_func()
+        self.model.setObjective(obj, gurobipy.GRB.MAXIMIZE)
+
+    def epsilon_constrained_method(self, quiet=True):
+        if quiet:
+            self.model.setParam("OutputFlag", 0)
+        non_dominated = []
+        self.objective_max_gain()
+        self.optimize()
+        x = {var.VarName: var.X for var in self.model.getVars()}
+        non_dominated.append({"var": x, "obj": self.objective_values()})
+        epsilon_2 = self.objective_min_affecte_func().getValue() + 1
+
+        #
+        infeasible = False
+        while not infeasible:
+            c_epsilon_2 = self.model.addConstr(self.objective_min_affecte_func() >= epsilon_2)
+            try:
+                self.optimize()
+                x = {var.VarName: var.X for var in self.model.getVars()}
+                non_dominated.append({"var": x, "obj": self.objective_values()})
+                epsilon_2 = self.objective_min_affecte_func().getValue() + 1
+
+                epsilon_3 = self.objective_min_length_func().getValue() + 1
+                infeasible2 = False
+                while not infeasible2:
+                    c_epsilon_3 = self.model.addConstr(self.objective_min_length_func() >= epsilon_3)
+                    try:
+                        self.optimize()
+                        x = {var.VarName: var.X for var in self.model.getVars()}
+                        non_dominated.append({"var": x, "obj": self.objective_values()})
+                        epsilon_3 = self.objective_min_length_func().getValue() + 1
+
+                    except ValueError:
+                        infeasible2 = True
+
+                    finally:
+                        self.model.remove(c_epsilon_3)
+                        self.model.update()
+
+            except ValueError:
+                infeasible = True
+
+            finally:
+                self.model.remove(c_epsilon_2)
+                self.model.update()
+
+            return non_dominated
+
+    def objective_values(self):
+        return (
+            self.objective_max_gain_fun().getValue(),
+            self.objective_min_affecte_func().getValue(),
+            self.objective_min_length_func().getValue(),
+        )
 
     def update(self):
         self.model.update()
 
     def optimize(self):
         self.model.optimize()
+        if self.model.status != gurobipy.GRB.OPTIMAL:
+            raise ValueError("Model failed to find optimal solution")
 
     def constraint_no_qual_work(self):
         for e in range(self.data.E):
