@@ -1,7 +1,6 @@
 import gurobipy
 import numpy as np
-
-from .loader import Data
+from loader import Data
 
 
 class Model:
