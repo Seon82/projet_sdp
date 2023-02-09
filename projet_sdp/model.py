@@ -1,7 +1,6 @@
 import gurobipy
 import numpy as np
-
-from .loader import Data
+from loader import Data
 
 
 class Model:
@@ -124,7 +123,9 @@ class Model:
     def update(self):
         self.model.update()
 
-    def optimize(self):
+    def optimize(self, quiet=False):
+        if quiet:
+            self.model.params.outputflag = 0
         self.model.optimize()
         if self.model.status != gurobipy.GRB.OPTIMAL:
             raise ValueError("Model failed to find optimal solution")
