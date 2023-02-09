@@ -9,6 +9,7 @@ Notre projet d'optimisation pour l'entreprise fictive CompuOpti, réalisé dans 
 * De trouver les solutions non-dominées à l'aide d'un algorithme ε-constraint.
 * De simuler un décideur et d'apprendre ses préférences.
 
+Un rapport détaillé ainsi que des slides de présentation sont disponibles dans le dossier [`rapport`](./rapport/).
 ## Installation
 Ce package nécessite `python>=3.10` ainsi qu'une installation gurobi.
 
@@ -17,6 +18,6 @@ Ce package nécessite `python>=3.10` ainsi qu'une installation gurobi.
 
 ## Démarrage
 
-Des notebooks présentant le package et ses principales fonctions sont disponibles dans le répertoire [`examples`](./examples/).
+Des notebooks présentant le package et ses principales fonctions sont disponibles dans le dossier [`examples`](./examples/).
 
 
