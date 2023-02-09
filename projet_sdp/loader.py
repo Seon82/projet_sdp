@@ -54,7 +54,7 @@ class Data:
     def penalite(self, p: int, j: int) -> int:
         if j > self.due_date(p):
             return self._penalty[p]
-        return 0
+        return 1e-5
 
 
 def load_data_from_json(path: str) -> Data:
