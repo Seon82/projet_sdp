@@ -1,6 +1,7 @@
 import gurobipy
 import numpy as np
-from loader import Data
+
+from .loader import Data
 
 
 class Model:
@@ -13,7 +14,7 @@ class Model:
         self._affecte = self._define_affecte()
         self._debute = self._define_debute()
 
-    def objective_max_gain_fun(self):
+    def objective_max_gain_func(self):
         sum_gain = sum(self.data.gain(p) * self.realise(p, self.data.N) for p in range(self.data.P))
         sum_penalite = sum(
             self.data.penalite(p, j) * (1 - self.realise(p, j)) for j in range(self.data.N) for p in range(self.data.P)
@@ -21,7 +22,7 @@ class Model:
         return sum_gain - sum_penalite
 
     def objective_max_gain(self):
-        obj = self.objective_max_gain_fun()
+        obj = self.objective_max_gain_func()
         self.model.setObjective(obj, gurobipy.GRB.MAXIMIZE)
 
     def objective_min_affecte_func(self):
@@ -46,13 +47,38 @@ class Model:
         if quiet:
             self.model.setParam("OutputFlag", 0)
         non_dominated = []
-        self.objective_max_gain()
+        self.model.setObjective(
+            1_000_000 * self.objective_max_gain_func()
+            + self.objective_min_affecte_func()
+            + self.objective_min_length_func(),
+            gurobipy.GRB.MAXIMIZE,
+        )
         self.optimize()
         x = {var.VarName: var.X for var in self.model.getVars()}
         non_dominated.append({"var": x, "obj": self.objective_values()})
-        epsilon_2 = self.objective_min_affecte_func().getValue() + 1
 
-        #
+        # Determine min_epsilon_2
+        min_epsilon_2 = self.objective_min_affecte_func().getValue()
+        epsilon_3 = self.objective_min_length_func().getValue() + 1
+        infeasible3 = False
+        while not infeasible3:
+            c_epsilon_3 = self.model.addConstr(self.objective_min_length_func() >= epsilon_3)
+            try:
+                self.optimize()
+                x = {var.VarName: var.X for var in self.model.getVars()}
+                non_dominated.append({"var": x, "obj": self.objective_values()})
+                epsilon_3 = self.objective_min_length_func().getValue() + 1
+                min_epsilon_2 = min(self.objective_min_affecte_func().getValue(), min_epsilon_2)
+
+            except ValueError:
+                infeasible3 = True
+
+            finally:
+                self.model.remove(c_epsilon_3)
+                self.model.update()
+
+        # Normal algorithm
+        epsilon_2 = min_epsilon_2 + 1
         infeasible = False
         while not infeasible:
             c_epsilon_2 = self.model.addConstr(self.objective_min_affecte_func() >= epsilon_2)
@@ -60,11 +86,11 @@ class Model:
                 self.optimize()
                 x = {var.VarName: var.X for var in self.model.getVars()}
                 non_dominated.append({"var": x, "obj": self.objective_values()})
-                epsilon_2 = self.objective_min_affecte_func().getValue() + 1
+                epsilon_2 += 1
 
                 epsilon_3 = self.objective_min_length_func().getValue() + 1
-                infeasible2 = False
-                while not infeasible2:
+                infeasible3 = False
+                while not infeasible3:
                     c_epsilon_3 = self.model.addConstr(self.objective_min_length_func() >= epsilon_3)
                     try:
                         self.optimize()
@@ -73,7 +99,7 @@ class Model:
                         epsilon_3 = self.objective_min_length_func().getValue() + 1
 
                     except ValueError:
-                        infeasible2 = True
+                        infeasible3 = True
 
                     finally:
                         self.model.remove(c_epsilon_3)
@@ -86,11 +112,11 @@ class Model:
                 self.model.remove(c_epsilon_2)
                 self.model.update()
 
-            return non_dominated
+        return non_dominated
 
     def objective_values(self):
         return (
-            self.objective_max_gain_fun().getValue(),
+            self.objective_max_gain_func().getValue(),
             self.objective_min_affecte_func().getValue(),
             self.objective_min_length_func().getValue(),
         )
