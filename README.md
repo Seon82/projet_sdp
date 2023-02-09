@@ -1,23 +1,22 @@
 # projet_sdp
 [![Linter Actions Status](https://github.com/Seon82/projet_sdp/actions/workflows/lint.yml//badge.svg?branch=main)](https://github.com/Seon82/projet_sdp/actions)
 
-A short description of the project
+Notre projet d'optimisation pour l'entreprise fictive CompuOpti, réalisé dans le cadre du cours de SDP. Celui-ci permet:
 
+* De charger des json décrivant le problème.
+* De modéliser et résoudre le problème en gurobi.
+* De visualiser les plannings générés.
+* De trouver les solutions non-dominées à l'aide d'un algorithme ε-constraint.
+* De simuler un décideur et d'apprendre ses préférences.
 
 ## Installation
-This package requires `python>=3.10`.
+Ce package nécessite `python>=3.10` ainsi qu'une installation gurobi.
 
-* Clone the repository.
-* Run `pip install .` from the root of the project to install the package and its dependencies.
+* Cloner le repo.
+* Exécuter `pip install .` depuis la racine du projet pour l'installer avec ses dépendances.
 
-## Contributing
-To contribute code to the repository:
+## Démarrage
 
-* Install [poetry](https://python-poetry.org/docs/#installation), our dependency management tool.
-* Clone the repository.
-* Install the project and its dependencies: `poetry install`.
-* Set up the pre-commit hooks to ensure code quality: `pre-commit install`.
-  
-To add dependencies to the project, use `poetry add` (for example `poetry add numpy`). 
+Des notebooks présentant le package et ses principales fonctions sont disponibles dans le répertoire [`examples`](./examples/).
 
 

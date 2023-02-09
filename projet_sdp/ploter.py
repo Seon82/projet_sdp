@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Patch
-from model import Model
+
+from .model import Model
 
 
 class Ploter:

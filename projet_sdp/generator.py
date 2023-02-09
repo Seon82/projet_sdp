@@ -1,6 +1,6 @@
 import random
 
-from loader import Data
+from .loader import Data
 
 
 def generate_random(N: int, E: int, P: int, Q: int) -> Data:
